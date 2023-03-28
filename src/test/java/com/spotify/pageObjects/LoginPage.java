@@ -28,6 +28,7 @@ public class LoginPage {
     By appleAuthBlock = By.cssSelector("div[id='stepEl']");
     By appleAuthenticationCheck = By.xpath("//div[contains(@class,'verify-phone fade-in')]//div//app-title");
     By digits = By.xpath("//div[@localiseddigit='Digit']/div/div/input");
+    By error = By.cssSelector("div.error.pop-top");
 
     public LoginPage(WebDriver driver) {
         this.driver = driver;
@@ -109,13 +110,20 @@ public class LoginPage {
     public WebElement getAppleLoginButton() {
         return driver.findElement(appleLoginButton);
     }
+
     public WebElement getAuthBlock() {
         return driver.findElement(appleAuthBlock);
     }
+
     public WebElement checkAuthentication() {
         return driver.findElement(appleAuthenticationCheck);
     }
+
     public WebElement getDigits() {
         return driver.findElement(digits);
+    }
+
+    public WebElement getError() {
+        return driver.findElement(error);
     }
 }
