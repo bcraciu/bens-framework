@@ -11,13 +11,14 @@ import org.springframework.beans.factory.annotation.Value;
 
 import java.time.Duration;
 
+import static org.apache.logging.log4j.core.util.Assert.isEmpty;
+
 public class ManageDriver {
 
     @Value("${browser}")
     private String browserUsed;
     @Value("${selenium.headless}")
     private Boolean headless;
-
     public static WebDriver driver;
     public WebDriverWait wait;
 
@@ -33,10 +34,6 @@ public class ManageDriver {
         return driver;
     }
     private void initialiseDriver() {
-        //String browserChoosen = this.browserChoosen;
-//        if (!isEmpty(driver)) {
-//            closeDriver();
-//        }
         if ("chrome".equals(browserUsed)) {
             setChromeDriver();
         } else if ("firefox".equals(browserUsed)) {
@@ -48,7 +45,6 @@ public class ManageDriver {
         driver.manage().deleteAllCookies();
         wait = new WebDriverWait(driver, Duration.ofSeconds(20));
         driver.manage().window().maximize();
-        //goToBaseUrl();
     }
 
     private void setChromeDriver() {
@@ -59,6 +55,8 @@ public class ManageDriver {
         chromeOptions.addArguments("--allow-insecure-localhost");
         chromeOptions.addArguments("--no-sandbox");
         chromeOptions.addArguments("--start-maximized");
+        chromeOptions.addArguments("--remote-allow-origins=*");
+
         driver = new ChromeDriver(chromeOptions);
 
 //        Headless mode
@@ -80,7 +78,6 @@ public class ManageDriver {
 //        }
         firefoxOptions.setBinary(firefoxBinary);
         driver = new FirefoxDriver(firefoxOptions);
-        //return driver;
     }
 
     public void closeDriver() {
@@ -89,5 +86,11 @@ public class ManageDriver {
         }
         driver.quit();
         driver = null;
+    }
+    public WebDriverWait getWait() {
+        if (isEmpty(wait)){
+            wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+        }
+        return this.wait;
     }
 }

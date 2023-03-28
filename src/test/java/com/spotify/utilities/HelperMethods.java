@@ -1,12 +1,14 @@
 package com.spotify.utilities;
 
+import com.google.gson.*;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Base64;
 import java.util.Properties;
 
 @Configuration
@@ -14,6 +16,7 @@ import java.util.Properties;
 public class HelperMethods {
     public static Properties properties;
     String propertyValue = "";
+    static JsonObject aJsonObject;
 
     public String getProperty(String property) {
         try {
@@ -46,4 +49,31 @@ public class HelperMethods {
         }
         return value;
     }
+
+    public static String getBase64Encoded(String id, String password) {
+        return Base64.getEncoder().encodeToString((id + ":" + password).getBytes(StandardCharsets.UTF_8));
+    }
+    public static JsonObject createAJson(String json) {
+        aJsonObject = new Gson().fromJson(json, JsonObject.class);
+        return aJsonObject;
+    }
+
+    public static JsonObject getJsonObject(String filePath) throws IOException {
+        JsonObject jObject;
+        Reader reader = Files.newBufferedReader(Paths.get(filePath));
+        jObject = JsonParser.parseReader(reader).getAsJsonObject();
+        return jObject;
+    }
+
+    public static JsonArray getJsonArray(String filePath) throws IOException {
+        JsonArray jArray;
+        Reader reader = Files.newBufferedReader(Paths.get(filePath));
+        jArray = JsonParser.parseReader(reader).getAsJsonArray();
+        return jArray;
+    }
+    public String getElemAsString(JsonObject resultJsonObject, String elementName) {
+        JsonElement element = resultJsonObject.get(elementName);
+        return element.toString().replaceAll("\"", "");
+    }
+
 }
