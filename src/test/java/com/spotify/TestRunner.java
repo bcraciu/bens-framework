@@ -11,7 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest(classes = {AutomationApplication.class})
 @CucumberOptions(
         features = {"classpath:features/"},
-        tags = "@SeleniumTests",
+        tags = "@SpotifyTests",
         glue = "com.spotify.tests.selenium",
         monochrome = true,
         plugin = {"pretty",

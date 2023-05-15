@@ -1,5 +1,6 @@
 package com.spotify.tests.api;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.spotify.utilities.HelperMethods;
@@ -33,6 +34,8 @@ public class ClientCredentialsFlow extends HelperMethods {
     ResponseEntity<String> response;
     HttpHeaders headers = new HttpHeaders();
     String token;
+    String artistName;
+    String trackName;
     @Autowired
     @Qualifier("restTemplateWithSSL")
     private RestTemplate restTemplate;
@@ -70,8 +73,8 @@ public class ClientCredentialsFlow extends HelperMethods {
         Assert.assertEquals("Token type is not bearer", "Bearer", tokenType);
     }
 
-    @When("User is searching for a track that is playing")
-    public void userIsSearchingForATrackThatIsPlaying() {
+    @When("User is searching for a track")
+    public void userIsSearchingForATrack() {
         String apiURL = apiBase + "/search?";
         headers.set(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
         headers.setBearerAuth(token);
@@ -79,9 +82,9 @@ public class ClientCredentialsFlow extends HelperMethods {
         String urlTemplate = UriComponentsBuilder.fromHttpUrl(apiURL)
                 .queryParam("q", "coldplay%20up%20and%20up")
                 .queryParam("type", "track")
-                .queryParam("market", "GB")
+                .queryParam("market", "US")
                 .queryParam("limit", "1")
-                .queryParam("offset", "1")
+                .queryParam("offset", "0")
                 .encode()
                 .toUriString();
 
@@ -101,12 +104,31 @@ public class ClientCredentialsFlow extends HelperMethods {
         Assert.assertEquals("Status not ok", 200, response.getStatusCode().value());
 
         String body = response.getBody();
-        LOG.info(body);
+        //LOG.info(body);
 
-
+        JsonObject bodyAsJson = JsonParser.parseString(Objects.requireNonNull(response.getBody())).getAsJsonObject();
+        JsonObject tracks = bodyAsJson.getAsJsonObject("tracks");
+        JsonArray items = tracks.getAsJsonArray("items");
+        JsonObject firstItem = items.get(0).getAsJsonObject();
+        trackName = firstItem.getAsJsonObject().getAsJsonPrimitive("name").toString().replaceAll("\"", "");
+        JsonArray artists = firstItem.getAsJsonArray("artists");
+        JsonObject artistsJson = artists.get(0).getAsJsonObject();
+        artistName = artistsJson.getAsJsonObject().getAsJsonPrimitive("name").toString().replaceAll("\"", "");
+        LOG.info("Track name is: " + trackName + " " + "// Artist name is: " + artistName);
     }
 
     @Then("The track is validated")
     public void theTrackIsValidated() {
+        Assert.assertEquals("Artist name is NOT Coldplay ..", "Coldplay", artistName);
+        Assert.assertEquals("Track name is NOT Up and Up ..", "Up&Up", trackName);
+    }
+
+
+    @When("User skips to the next track")
+    public void userSkipsToTheNextTrack() {
+    }
+
+    @Then("The next track is playing")
+    public void theNextTrackIsPlaying() {
     }
 }
