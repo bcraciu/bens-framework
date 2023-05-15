@@ -12,7 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 @CucumberOptions(
         features = {"classpath:features/"},
         tags = "@SpotifyTests",
-        glue = "com.spotify.tests",
+        glue = "com.spotify.tests.selenium",
         monochrome = true,
         plugin = {"pretty",
                 "json:/target/cucumber-reports/test.json",
